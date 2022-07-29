@@ -58,29 +58,41 @@ namespace JpgDataEncoder
                     jpgFile = dataFileInfo.FullName.Substring(0, dataFileInfo.FullName.Length - extensionLen) + ".jpeg";
                     jpgFileInfo = new FileInfo(jpgFile);
                 }
-                if (!jpgFileInfo.Exists)
-                {
-                    Console.WriteLine($"Unable to find jpg file, skip: {dataFile}");
-                    continue;
-                }
 
-                var combinedFile = dataFileInfo.FullName.Substring(0, dataFileInfo.FullName.Length - extensionLen) + $".C_{extension}_.jpg";
-                var combinedFileInfo = new FileInfo(combinedFile);
-
-                if (combinedFileInfo.Exists)
-                {
-                    Console.WriteLine($"Combined file exists, skip: {dataFile}");
-                    continue;
-                }
+                var deletePlaceHolderFile = false;
                 try
                 {
-                    JpegEncodeUtil.Encode(jpgFileInfo, dataFileInfo, combinedFileInfo);
-                    Console.WriteLine($"Combined file: {dataFile}");
+                    if (!jpgFileInfo.Exists)
+                    {
+                        JpegEncodeUtil.GenerateJpg(jpgFileInfo, $"Place holder: {dataFileInfo.Name}");
+                        deletePlaceHolderFile = true;
+                        Console.WriteLine($"Unable to find jpg file, use placeholder instead: {dataFile}"); ;
+                    }
+
+                    var combinedFile = dataFileInfo.FullName.Substring(0, dataFileInfo.FullName.Length - extensionLen) + $".C_{extension}_.jpg";
+                    var combinedFileInfo = new FileInfo(combinedFile);
+
+                    if (combinedFileInfo.Exists)
+                    {
+                        Console.WriteLine($"Combined file exists, skip: {dataFile}");
+                        continue;
+                    }
+                    try
+                    {
+                        JpegEncodeUtil.Encode(jpgFileInfo, dataFileInfo, combinedFileInfo);
+                        Console.WriteLine($"Combined file: {dataFile}");
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Failed to combine file {dataFile}: {ex.Message}");
+                    }
                 }
-                catch (Exception ex)
+                finally
                 {
-                    Console.WriteLine($"Failed to combine file {dataFile}: {ex.Message}");
+                    if (deletePlaceHolderFile && jpgFileInfo.Exists)
+                        jpgFileInfo.Delete();
                 }
+                
             }
         }
 

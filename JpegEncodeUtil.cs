@@ -2,11 +2,44 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using System.Drawing;
+using System.Drawing.Imaging;
 
 namespace JpgDataEncoder
 {
     static class JpegEncodeUtil
     {
+        public static void GenerateJpg(FileInfo jpgFile, string text)
+        {
+            var font = new Font("Arial", 12);
+
+            SizeF textSize;
+            using (var img = new Bitmap(1, 1))
+            using (var drawing = Graphics.FromImage(img))
+                textSize = drawing.MeasureString(text, font);
+
+
+            //create a new image of the right size
+            using (var img = new Bitmap((int)textSize.Width, (int)textSize.Height))
+            using (var drawing = Graphics.FromImage(img))
+            {
+
+                drawing.Clear(Color.White);
+
+                //create a brush for the text
+                using (var textBrush = new SolidBrush(Color.Black))
+                {
+                    drawing.DrawString(text, font, textBrush, 0, 0);
+
+                    drawing.Save();
+                }
+
+                using (var writer = File.Create(jpgFile.FullName))
+                    img.Save(writer, ImageFormat.Jpeg);
+            }
+        }
+
+
         public static void Encode(FileInfo jpgFile, FileInfo dataFile, FileInfo outputFile)
         {
             using (var writer = File.Create(outputFile.FullName))
