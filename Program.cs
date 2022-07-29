@@ -89,7 +89,7 @@ namespace JpgDataEncoder
                 }
                 finally
                 {
-                    if (deletePlaceHolderFile && jpgFileInfo.Exists)
+                    if (deletePlaceHolderFile && File.Exists(jpgFileInfo.FullName))
                         jpgFileInfo.Delete();
                 }
                 
