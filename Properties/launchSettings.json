@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "JpgDataEncoder": {
+      "commandName": "Project",
+      "commandLineArgs": "-a E -p \"G:\\Temp\\2022-07-29\" -e \"txt\""
+    }
+  }
+}
